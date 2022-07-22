@@ -2,20 +2,20 @@ const urlModel = require("../models/urlModel");
 const shortid = require('shortid')
 const validUrl = require('valid-url')
 const redis = require('redis')
-const { promisify } = require("util");
+const  { promisify }  = require("util")
 
 
 //Connect to redis
 const redisClient = redis.createClient(
-  13190,
-  "redis-13190.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+  13190,         //Port Value
+  "redis-13190.c301.ap-south-1-1.ec2.cloud.redislabs.com",   //Host value
   { no_ready_check: true }
 );
-redisClient.auth("gkiOIPkytPI3ADi14jHMSWkZEo2J5TDG", function (err) {
+redisClient.auth("gkiOIPkytPI3ADi14jHMSWkZEo2J5TDG", function (err) {          //Password || Auth value
   if (err) throw err;
 });
 
-redisClient.on("connect", async function () {
+redisClient.on("connect", async function () {     
   console.log("Connected to Redis..");
 });
  
@@ -37,14 +37,14 @@ const createUrl = async function (req, res) {
     if (!longUrl || typeof longUrl != "string" || longUrl.trim().length == 0){
         return res.status(400).send({status:false, message:"LongUrl must be present and Typeof must be String."})
     }
-  
-    if (!validUrl.isUri(longUrl)){
-      return res.status(400).send({status:false, message:"URL incorect"})
-    }
+
+    let reg =  /^(ftp|http|https):\/\/[^ "]+$/
+     if(!reg.test(longUrl)) return res.status(400).send({status:false, message:"Please provide a valid url."})
+
 
     let data =await urlModel.findOne({longUrl}).select({_id:0,longUrl:1,shortUrl:1,urlCode:1})
     if(data){
-      return res.status(200).send({status:true, message: "urlCode is already generated for this URL.",data:data})
+      return res.status(201).send({status:true, message: "urlCode is already generated for this URL.",data:data})
     }
 
     const str = 'http://localhost:3000/'
