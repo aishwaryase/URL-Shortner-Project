@@ -4,7 +4,7 @@ const mongoose = require ('mongoose')
 const urlSchema = new mongoose.Schema({
 
 
-    urlCode : {
+    urlCode : {  
         type : String,
         required: true,
         unique: true,
